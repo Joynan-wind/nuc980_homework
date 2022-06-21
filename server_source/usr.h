@@ -41,12 +41,14 @@ int gpio_set(const char *gpio_num, const char *gpio_val);
 
 /*-----------------------------网络通信----------------------------*/
 void *server(void* arg);
-/*---------------------------串口通信------------------------------*/
+/*---------------------------串口屏通信------------------------------*/
 int uart_send(int fd,void* buf);
 int uart_receive(int fd,char* buf);
 void reset_tty_atexit(void);
 void reset_tty_handler(int signal);
 int open_port(const char *portname);
 void *uart(void*arg);
+/*----------------------------蓝牙通信---------------------------------*/
+/*---------------------------PWM电机/舵机模块--------------------------*/
 
 #endif

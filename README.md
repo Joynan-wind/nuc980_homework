@@ -2,7 +2,7 @@
  Curriculum design of “Embedded operating system”
 
 小组成员
-    电子1194 翁宗南 陈富烨 周雨康
+    电子1194 翁宗南 陈富烨 陈雨康
 课设功能
     网络通信与串口屏控制LED状态，并将信息显示在串口屏上。
 说明

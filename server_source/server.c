@@ -13,6 +13,7 @@ void *server(void* arg)
     int addrlen = sizeof(client_addr);
     char recvbuf[512];
     int ret;
+    
     /* 打开套接字，得到套接字描述符 */
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (0 > sockfd)
@@ -54,6 +55,7 @@ void *server(void* arg)
     /* 接收客户端发送过来的数据 */
     while(1)
     {
+        printf("server work");  //调试用
         // 接收缓冲区清零
         memset(recvbuf, 0x0, sizeof(recvbuf));
         // 读数据
@@ -64,15 +66,25 @@ void *server(void* arg)
             close(connfd);
             break;
         }
-        // 将读取到的数据以字符串形式打印出来
+        // 将读取到的数据传给led状态结构体
         printf("from client: %s\n", recvbuf);
         if(0 == strncmp("off",recvbuf,3))
         {
-            LED0.val=off;
+            LED0_set.val=off;
         }
         if(0 == strncmp("on",recvbuf,2))
         {
-            LED0.val=on;
+            LED0_set.val=on;
+        }
+        //判断是否接收到电机控制指令
+        if(0==strncmp("PWM",recvbuf,3))
+        {
+            sscanf(recvbuf,"PWM%d",&PWM02_set.rate); //提取字符中的数字，转化为int型数据
+            if(PWM02_set.rate<0||PWM02_set.rate>100)
+            {
+                printf("PWM rate set error");
+            }
+            printf("%d",PWM02_set.rate);
         }
         // 如果读取到"exit"则关闭套接字退出程序
         if (0 == strncmp("exit", recvbuf, 4))

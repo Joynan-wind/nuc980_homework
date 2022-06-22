@@ -50,8 +50,8 @@ int open_port(const char *portname)
     newtios.c_cc[VMIN]=1;                 //block until 1 char received
     newtios.c_cc[VTIME]=0;                 //no inter-character timer
     //baund
-    cfsetospeed(&newtios,B9600);
-    cfsetispeed(&newtios,B9600);
+    cfsetospeed(&newtios,B115200);
+    cfsetispeed(&newtios,B115200);
     //register cleanup stuff
     atexit(reset_tty_atexit);
     memset(&sa,0,sizeof sa);
@@ -71,11 +71,13 @@ int uart_send(int fd,void* buf)
 {
     int portfd =fd;
     int rev;
+    int len;
 
-    rev = write(portfd,buf,13);
+    len=strlen(buf);
+    rev = write(portfd,buf,len);
     if(rev>0)
     {
-        printf("info %d update success!\n",rev);
+        printf("info update success!\n");
     }
     else
     {
@@ -91,28 +93,32 @@ int uart_receive(int fd,char* buf)
     rev=read(portfd,buf,100);
     if(rev>0)
     {
-        printf("screen buttn %s",buf);
+        printf("%d byte read.\n",rev);
+        printf("screen buttn %s\n",buf);
     }
 }
-void *uart(void*arg)
+void *uart_process(void*arg)
 {    
-
-    char *dev[10]={"/dev/ttyS1"};
-
-    tty_fd=open_port(dev[0]);
 
     while(1)
     {
         uart_receive(tty_fd,Rxbuf);
         if(0 == strncmp("off",Rxbuf,3))
         {
-            LED0.val=off;
-            LED0.lcd_val=off;
+            LED0_set.val=off;
+            LED0_set.lcd_val=off;
         }
         if(0 == strncmp("on",Rxbuf,2))
         {
-            LED0.val=on;
-            LED0.lcd_val=on;
+            LED0_set.val=on;
+            LED0_set.lcd_val=on;
+        }
+       if(0 == strncmp("R",Rxbuf,1))                      //内存溢出？sccanf语法用错了
+        {
+            printf("Rxbuf =%s\n",Rxbuf);
+            sscanf(Rxbuf,"R%d\x0D\x0a",&PWM02_set.lcd_rate);  //注意取地址符，不然会报错
+            printf("PWM02.lcd_rate=%d\n",PWM02_set.lcd_rate);                    //调试用信息
+            PWM02_set.rate=PWM02_set.lcd_rate;
         }
     }
 }

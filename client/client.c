@@ -25,7 +25,7 @@ int main(void)
     /* 调用 connect 连接远端服务器 */
     server_addr.sin_family = AF_INET;                      //协议族ip4
     server_addr.sin_port = htons(SERVER_PORT);            //端口号，htons为宏定义
-    inet_pton(AF_INET, SERVER_IP, &server_addr.sin_addr); // IP 地址
+    inet_pton(AF_INET, SERVER_IP, &server_addr.sin_addr); // IP 地址转换为二进制
     ret = connect(sockfd, (struct sockaddr *)&server_addr, sizeof(server_addr));//连接，参数：套接字描述符、服务器地址（结构体），地址字节
     if (0 > ret)
     {

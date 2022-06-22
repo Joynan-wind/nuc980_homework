@@ -2,7 +2,7 @@
 usage：函数名（指定gpio编号，电平）
 */
 #include "usr.h"
-static rev=1;
+int Direc_init_FLAGS=1;
 
 int gpio_config(const char *attr,const char *val)
 {
@@ -29,7 +29,6 @@ int gpio_config(const char *attr,const char *val)
 }
 int gpio_set(const char * gpio_num,const char *gpio_val)
 {
-    char file_path[100];
     int fd;
     sprintf(gpio_path,"/sys/class/gpio/gpio%s",gpio_num);
     if(access(gpio_path,F_OK))
@@ -40,7 +39,8 @@ int gpio_set(const char * gpio_num,const char *gpio_val)
             perror("open2 error");
             exit(-1);
         }
-        if(0 > write(fd,gpio_num,strlen(gpio_num)))
+        len=strlen(gpio_num);
+        if(len != write(fd,gpio_num,len))
         {
             perror("write2 error");
             close(fd);
@@ -48,8 +48,8 @@ int gpio_set(const char * gpio_num,const char *gpio_val)
         }
         close(fd);
     }
-    if(rev)
-    {rev=gpio_config("direction", "out");}
+    if(Direc_init_FLAGS)
+    {Direc_init_FLAGS=gpio_config("direction", "out");}
     /* 极性设置 */
     gpio_config("value",gpio_val);
     /* 配置为非中断方式 */
